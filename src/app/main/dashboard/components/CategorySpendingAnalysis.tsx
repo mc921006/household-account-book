@@ -1,7 +1,11 @@
 import type { CSSProperties } from "react";
+import { useMemo } from "react";
 import type { CategorySpending, TransactionPreview } from "../types";
 import {
+  filterTransactionsByMonth,
+  formatMonthLabel,
   getCategorySpendingAnalysis,
+  getCurrentMonthValue,
   moneyFormatter,
 } from "../utils";
 import styles from "../dashboard.module.scss";
@@ -145,7 +149,12 @@ export function CategorySpendingAnalysis({
   transactions,
   isLoadingTransactions,
 }: CategorySpendingAnalysisProps) {
-  const { total, categories } = getCategorySpendingAnalysis(transactions);
+  const currentMonth = getCurrentMonthValue();
+  const monthlyTransactions = useMemo(
+    () => filterTransactionsByMonth(transactions, currentMonth),
+    [currentMonth, transactions],
+  );
+  const { total, categories } = getCategorySpendingAnalysis(monthlyTransactions);
   const donutStyle =
     categories.length > 0
       ? ({ background: buildDonutGradient(categories) } satisfies CSSProperties)
@@ -169,8 +178,7 @@ export function CategorySpendingAnalysis({
         <div className={styles.emptyList}>소비 분석을 불러오는 중입니다.</div>
       ) : categories.length === 0 ? (
         <div className={styles.emptyList}>
-          아직 분석할 지출 거래가 없습니다. 거래를 저장하면 카테고리별 소비
-          비중이 표시됩니다.
+          {formatMonthLabel(currentMonth)}에 분석할 지출 거래가 없습니다.
         </div>
       ) : (
         <div className={styles.categoryAnalysisGrid}>

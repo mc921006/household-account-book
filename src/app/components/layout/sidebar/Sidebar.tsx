@@ -7,9 +7,6 @@ import styles from "./sidebar.module.scss";
 const menus = [
   { label: "대시보드", href: "/main/dashboard" },
   { label: "거래내역", href: "/main/transactions" },
-  { label: "분류", href: "/main/dashboard" },
-  { label: "예산", href: "/main/dashboard" },
-  { label: "설정", href: "/main/dashboard" },
 ];
 
 export default function Sidebar() {

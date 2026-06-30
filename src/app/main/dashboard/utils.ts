@@ -35,11 +35,11 @@ function isValidDatePart(year: number, month: number, day: number) {
   );
 }
 
-export function formatTransactionDateTime(value: string) {
+function parseTransactionDate(value: string) {
   const trimmedValue = value.trim();
 
   if (!trimmedValue) {
-    return "날짜 없음";
+    return null;
   }
 
   const dateTimeMatch = trimmedValue.match(
@@ -53,9 +53,9 @@ export function formatTransactionDateTime(value: string) {
     const day = Number(dateTimeMatch[3]);
 
     if (isValidDatePart(year, month, day)) {
-      return formatDateParts(
+      return new Date(
         year,
-        month,
+        month - 1,
         day,
         Number(dateTimeMatch[4] ?? 0),
         Number(dateTimeMatch[5] ?? 0),
@@ -74,9 +74,9 @@ export function formatTransactionDateTime(value: string) {
     const day = Number(monthDayTimeMatch[2]);
 
     if (isValidDatePart(year, month, day)) {
-      return formatDateParts(
+      return new Date(
         year,
-        month,
+        month - 1,
         day,
         Number(monthDayTimeMatch[3]),
         Number(monthDayTimeMatch[4]),
@@ -87,7 +87,17 @@ export function formatTransactionDateTime(value: string) {
 
   const parsedDate = new Date(trimmedValue);
 
-  if (!Number.isNaN(parsedDate.getTime())) {
+  return Number.isNaN(parsedDate.getTime()) ? null : parsedDate;
+}
+
+export function formatTransactionDateTime(value: string) {
+  const parsedDate = parseTransactionDate(value);
+
+  if (!value.trim()) {
+    return "날짜 없음";
+  }
+
+  if (parsedDate) {
     return formatDateParts(
       parsedDate.getFullYear(),
       parsedDate.getMonth() + 1,
@@ -98,7 +108,42 @@ export function formatTransactionDateTime(value: string) {
     );
   }
 
-  return trimmedValue;
+  return value.trim();
+}
+
+export function getCurrentMonthValue() {
+  const date = new Date();
+
+  return `${date.getFullYear()}-${padDatePart(date.getMonth() + 1)}`;
+}
+
+export function getTransactionMonthValue(transaction: TransactionPreview) {
+  const parsedDate = parseTransactionDate(transaction.paidAt);
+
+  if (!parsedDate) {
+    return "";
+  }
+
+  return `${parsedDate.getFullYear()}-${padDatePart(parsedDate.getMonth() + 1)}`;
+}
+
+export function filterTransactionsByMonth(
+  transactions: TransactionPreview[],
+  monthValue: string,
+) {
+  return transactions.filter(
+    (transaction) => getTransactionMonthValue(transaction) === monthValue,
+  );
+}
+
+export function formatMonthLabel(monthValue: string) {
+  const match = monthValue.match(/^(\d{4})-(\d{2})$/);
+
+  if (!match) {
+    return monthValue;
+  }
+
+  return `${match[1]}년 ${Number(match[2])}월`;
 }
 
 export function normalizeDbTransaction(

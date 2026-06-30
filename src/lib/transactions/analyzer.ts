@@ -16,6 +16,11 @@ export type QuickTransactionAnalysis = {
   error?: string;
 };
 
+export type TransactionParseResult = {
+  transactions: QuickTransactionInput[];
+  invalidLines: string[];
+};
+
 export const QUICK_CATEGORIES = [
   "카페",
   "식비",
@@ -241,6 +246,39 @@ export function parseQuickTransactionInput(
   };
 }
 
+function parseMultipleQuickTransactionInputs(input: string) {
+  const matches = [...input.matchAll(/(\d[\d,]*)\s*원?/g)];
+
+  if (matches.length <= 1) {
+    return null;
+  }
+
+  const transactions: QuickTransactionInput[] = [];
+  let merchantStart = 0;
+
+  for (const match of matches) {
+    const amountStart = match.index ?? 0;
+    const nextMerchantStart = amountStart + match[0].length;
+    const merchant = input.slice(merchantStart, amountStart).trim();
+    const transaction = parseQuickTransactionInput(
+      `${merchant} ${match[1]}원`,
+    );
+
+    if (!transaction) {
+      return null;
+    }
+
+    transactions.push(transaction);
+    merchantStart = nextMerchantStart;
+  }
+
+  if (input.slice(merchantStart).trim()) {
+    return null;
+  }
+
+  return transactions;
+}
+
 function createQuickTransactionFromParts(
   merchant: string,
   amount: number,
@@ -288,17 +326,25 @@ function isNonTransactionText(line: string) {
   return /누적|잔액|채널\s*추가|마케팅|광고|혜택|이벤트/i.test(line);
 }
 
-export function parseTransactionInputs(input: string): QuickTransactionInput[] {
+export function parseTransactionInputDetails(input: string): TransactionParseResult {
   const lines = input
     .split("\n")
     .map((line) => line.trim())
     .filter(Boolean);
   const transactions: QuickTransactionInput[] = [];
+  const invalidLines: string[] = [];
 
   for (let index = 0; index < lines.length; index += 1) {
     const line = lines[index];
 
     if (isNonTransactionText(line)) {
+      continue;
+    }
+
+    const quickTransactions = parseMultipleQuickTransactionInputs(line);
+
+    if (quickTransactions) {
+      transactions.push(...quickTransactions);
       continue;
     }
 
@@ -312,6 +358,7 @@ export function parseTransactionInputs(input: string): QuickTransactionInput[] {
     const amountMatch = line.match(/([\d,]+)\s*원/);
 
     if (!amountMatch || isNonTransactionText(line)) {
+      invalidLines.push(line);
       continue;
     }
 
@@ -331,8 +378,14 @@ export function parseTransactionInputs(input: string): QuickTransactionInput[] {
 
     if (transaction) {
       transactions.push(transaction);
+    } else {
+      invalidLines.push(line);
     }
   }
 
-  return transactions;
+  return { transactions, invalidLines };
+}
+
+export function parseTransactionInputs(input: string): QuickTransactionInput[] {
+  return parseTransactionInputDetails(input).transactions;
 }

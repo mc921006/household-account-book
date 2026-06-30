@@ -53,10 +53,14 @@ export function useDashboardTransactions() {
 
   const persistTransactions = useCallback(
     async (items: QuickTransactionInput[]) => {
-      if (!user) {
+      const currentUser = await fetchCurrentUser();
+
+      if (!currentUser) {
         alert("로그인이 필요합니다.");
         return null;
       }
+
+      setUser(currentUser);
 
       if (items.length === 0) {
         alert("저장할 분석 결과가 없습니다.");
@@ -66,7 +70,10 @@ export function useDashboardTransactions() {
       setIsSaving(true);
 
       try {
-        const omittedColumns = await insertTransactionsWithFallback(user.id, items);
+        const omittedColumns = await insertTransactionsWithFallback(
+          currentUser.id,
+          items,
+        );
 
         if (omittedColumns.size > 0) {
           console.warn(
@@ -76,7 +83,7 @@ export function useDashboardTransactions() {
           );
         }
 
-        await fetchTransactions(user.id);
+        await fetchTransactions(currentUser.id);
         return formatSavedTransactionsMessage(items);
       } catch (error) {
         console.error(error);
@@ -86,7 +93,7 @@ export function useDashboardTransactions() {
         setIsSaving(false);
       }
     },
-    [fetchTransactions, user],
+    [fetchTransactions],
   );
 
   return {

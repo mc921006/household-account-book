@@ -1,5 +1,5 @@
 import type { QuickTransactionInput } from "@/lib/transactions/analyzer";
-import { parseTransactionInputs } from "@/lib/transactions/analyzer";
+import { parseTransactionInputDetails } from "@/lib/transactions/analyzer";
 import { useRef, useState } from "react";
 import { refineTransactionsWithAI } from "../services";
 import type { MerchantCategoryMapping } from "../types";
@@ -34,10 +34,25 @@ export function useTransactionAnalysis({
 
   const analyzeMessage = async () => {
     const trimmedMessage = messageText.trim();
-    const localTransactions = parseTransactionInputs(trimmedMessage);
+    const { transactions: localTransactions, invalidLines } =
+      parseTransactionInputDetails(trimmedMessage);
 
     if (localTransactions.length === 0) {
+      setAnalyzedTransactions([]);
+      setStatusMessage(
+        "입력 방식이 잘못됐습니다. 예: 메가커피 4500 또는 결제 문자 원문을 입력해주세요.",
+      );
       alert("분석할 결제 문자나 빠른 입력을 입력해주세요.");
+      return;
+    }
+
+    if (invalidLines.length > 0) {
+      setAnalyzedTransactions([]);
+      setStatusMessage(
+        `입력 방식이 잘못된 줄이 있습니다: ${invalidLines
+          .slice(0, 3)
+          .join(", ")}. 예: 메가커피 4500`,
+      );
       return;
     }
 

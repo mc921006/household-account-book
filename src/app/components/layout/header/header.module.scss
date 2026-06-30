@@ -22,6 +22,9 @@
 .header strong {
   color: #17202a;
   font-size: 17px;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
 }
 
 .header span {
@@ -48,10 +51,20 @@
 
 @media (max-width: 640px) {
   .header {
+    gap: 12px;
     padding: 0 18px;
+  }
+
+  .header strong {
+    font-size: 15px;
   }
 
   .header span {
     display: none;
+  }
+
+  .header button {
+    flex: 0 0 auto;
+    padding: 0 12px;
   }
 }

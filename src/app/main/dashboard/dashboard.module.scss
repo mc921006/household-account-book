@@ -2,6 +2,7 @@
   display: flex;
   flex-direction: column;
   gap: 24px;
+  min-width: 0;
 }
 
 .summary,
@@ -21,6 +22,13 @@
   gap: 28px;
   padding: 28px;
   align-items: end;
+}
+
+.summary > div,
+.workspace > *,
+.history,
+.categoryAnalysis {
+  min-width: 0;
 }
 
 .summary h1 {
@@ -56,6 +64,7 @@
   display: flex;
   justify-content: space-between;
   gap: 16px;
+  align-items: center;
   padding: 14px 16px;
   border-radius: 8px;
   background: #f5f7f2;
@@ -87,6 +96,11 @@
   gap: 16px;
   align-items: center;
   margin-bottom: 18px;
+  min-width: 0;
+}
+
+.panelHeader > div {
+  min-width: 0;
 }
 
 .panelHeader h2 {
@@ -462,9 +476,33 @@
   background: #fbfcfd;
 }
 
+.monthlyTotalBox {
+  display: flex;
+  justify-content: space-between;
+  gap: 16px;
+  align-items: center;
+  margin-bottom: 12px;
+  border: 1px solid #e3e8ee;
+  border-radius: 8px;
+  background: #f5f7f2;
+  padding: 14px 16px;
+}
+
+.monthlyTotalBox span {
+  color: #55606b;
+  font-size: 13px;
+  font-weight: 800;
+}
+
+.monthlyTotalBox strong {
+  color: #b5473f;
+  font-size: 18px;
+  white-space: nowrap;
+}
+
 .transactionTable {
   width: 100%;
-  min-width: 840px;
+  min-width: 760px;
   border-collapse: collapse;
 }
 
@@ -516,6 +554,102 @@
   color: #17202a;
   font-size: 18px;
   white-space: nowrap;
+}
+
+.monthControlGroup {
+  position: relative;
+  display: flex;
+  gap: 8px;
+  align-items: center;
+  justify-content: flex-end;
+  flex-wrap: wrap;
+}
+
+.monthPickerButton {
+  min-height: 38px;
+  border: 1px solid #cfd8e2;
+  border-radius: 8px;
+  background: #ffffff;
+  color: #17202a;
+  font: inherit;
+  font-size: 13px;
+  font-weight: 800;
+  padding: 0 14px;
+  cursor: pointer;
+}
+
+.monthPickerButton:hover,
+.monthPickerButton:focus {
+  border-color: #1f6f55;
+  color: #1f6f55;
+  box-shadow: 0 0 0 3px rgba(31, 111, 85, 0.12);
+  outline: none;
+}
+
+.monthPicker {
+  position: absolute;
+  top: calc(100% + 8px);
+  right: 0;
+  z-index: 10;
+  width: 236px;
+  border: 1px solid #dde3ea;
+  border-radius: 8px;
+  background: #ffffff;
+  box-shadow: 0 16px 36px rgba(25, 35, 49, 0.14);
+  padding: 12px;
+}
+
+.monthPickerHeader {
+  display: grid;
+  grid-template-columns: 38px minmax(0, 1fr) 38px;
+  gap: 8px;
+  align-items: center;
+  margin-bottom: 10px;
+}
+
+.monthPickerHeader strong {
+  color: #17202a;
+  font-size: 15px;
+  text-align: center;
+}
+
+.monthPickerHeader button,
+.monthGrid button {
+  border: 1px solid #d5dce4;
+  border-radius: 8px;
+  background: #ffffff;
+  color: #42505e;
+  font: inherit;
+  font-weight: 800;
+  cursor: pointer;
+}
+
+.monthPickerHeader button {
+  height: 34px;
+  font-size: 20px;
+  line-height: 1;
+}
+
+.monthGrid {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 8px;
+}
+
+.monthGrid button {
+  height: 36px;
+  font-size: 13px;
+}
+
+.monthPickerHeader button:hover,
+.monthPickerHeader button:focus,
+.monthGrid button:hover,
+.monthGrid button:focus,
+.monthGrid .activeMonth {
+  border-color: #1f6f55;
+  background: #1f6f55;
+  color: #ffffff;
+  outline: none;
 }
 
 .categoryAnalysisGrid {
@@ -736,11 +870,29 @@
   .reviewPanel,
   .history,
   .categoryAnalysis {
-    padding: 18px;
+    padding: 16px;
   }
 
   .summary h1 {
     font-size: 24px;
+  }
+
+  .dashboard {
+    gap: 18px;
+  }
+
+  .summary {
+    gap: 18px;
+  }
+
+  .totalItem,
+  .monthlyTotalBox {
+    gap: 8px;
+  }
+
+  .totalItem strong,
+  .monthlyTotalBox strong {
+    font-size: 16px;
   }
 
   .panelHeader,
@@ -748,6 +900,26 @@
   .previewCard,
   .confirmItem {
     align-items: stretch;
+  }
+
+  .panelHeader {
+    display: grid;
+    grid-template-columns: 1fr;
+  }
+
+  .monthControlGroup {
+    width: 100%;
+    justify-content: stretch;
+  }
+
+  .monthPickerButton {
+    width: 100%;
+  }
+
+  .monthPicker {
+    left: 0;
+    right: auto;
+    width: 100%;
   }
 
   .confirmItem {
@@ -762,6 +934,15 @@
     grid-template-columns: 1fr;
   }
 
+  .monthlyTotalBox {
+    display: grid;
+    gap: 6px;
+  }
+
+  .transactionTable {
+    min-width: 680px;
+  }
+
   .analysisMetrics {
     grid-template-columns: 1fr;
   }
@@ -769,6 +950,8 @@
   .donutPanel {
     grid-template-columns: 1fr;
     justify-items: center;
+    min-height: 0;
+    padding: 16px;
   }
 
   .categoryLegend {
@@ -776,11 +959,17 @@
   }
 
   .legendItem {
-    grid-template-columns: auto minmax(0, 1fr);
+    grid-template-columns: auto minmax(0, 1fr) auto;
+    width: 100%;
+  }
+
+  .legendItem div {
+    justify-content: space-between;
+    min-width: 0;
   }
 
   .legendItem em {
-    grid-column: 2;
+    justify-self: end;
   }
 
   .actionRow {
