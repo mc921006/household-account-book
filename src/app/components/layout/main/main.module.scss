@@ -1,0 +1,12 @@
+.main {
+  flex: 1;
+  min-width: 0;
+  padding: 28px;
+  background: #f4f6f8;
+}
+
+@media (max-width: 640px) {
+  .main {
+    padding: 18px;
+  }
+}
